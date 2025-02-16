@@ -2,35 +2,33 @@ import mysql from "mysql2";
 import { faker } from "@faker-js/faker";
 
 const connection = mysql.createConnection({
-    host: "localhost",
+    host: "127.0.0.1",
     user: "root",
-    password: "",
+    password: "Satyam@123",
     database: "delta_app",
 });
 
-connection.connect((err) => {
+const getRandomUser = () => {
+    return [
+        faker.string.uuid(),
+        faker.internet.username(),  // Fixed deprecated method
+        faker.internet.email(),
+        faker.internet.password(),
+    ];
+};
+
+const q = "INSERT INTO user (id, username, email, password) VALUES ?";
+const data = [];
+
+for (let i = 0; i < 100; i++) { // Loop should start from 0 to get 100 entries
+    data.push(getRandomUser());
+}
+
+connection.query(q, [data], (err, result) => {
     if (err) {
-        console.error("MySQL connection failed: ", err);
-        return;
+        console.error("Error inserting data:", err);
+    } else {
+        console.log("Data inserted successfully:", result);
     }
-    console.log("Connected to MySQL successfully!");
-
-    connection.query("SHOW TABLES", (err, result) => {
-        if (err) {
-            console.error("Error fetching tables: ", err);
-        } else {
-            console.log("Tables: ", result);
-        }
-
-        connection.end();
-    });
+    connection.end();  // Close connection after query finishes
 });
-
-const getRandomUser = () => ({
-    id: faker.string.uuid(),
-    username: faker.internet.userName(),
-    email: faker.internet.email(),
-    password: faker.internet.password(),
-});
-
-console.log("Generated User: ", getRandomUser());
