@@ -1,6 +1,5 @@
 import mysql from "mysql2";
 import express from "express";
-import { faker } from "@faker-js/faker";
 import path from "path";
 import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
@@ -53,11 +52,7 @@ app.get("/search", (req, res) => {
     let query = req.query.q?.trim();
     if (!query) return res.json([]);
 
-    let searchQuery = `
-        SELECT id, username, email FROM user 
-        WHERE username LIKE ? OR email LIKE ? 
-        LIMIT 10
-    `;
+    let searchQuery = `SELECT id, username, email FROM user WHERE username LIKE ? OR email LIKE ? LIMIT 10`;
     connection.query(searchQuery, [`%${query}%`, `%${query}%`], (err, results) => {
         if (err) return res.json([]);
         res.json(results);
@@ -66,15 +61,14 @@ app.get("/search", (req, res) => {
 
 app.post("/add-user", (req, res) => {
     const { username, email, password } = req.body;
-    if (!username || !email || !password) return res.json({ success: false });
+    if (!username || !email || !password) return res.json({ success: false, message: "All fields are required" });
 
     const q = "INSERT INTO user (username, email, password) VALUES (?, ?, ?)";
-
     connection.query(q, [username, email, password], (err, result) => {
-        if (err) return res.json({ success: false });
+        if (err) return res.json({ success: false, message: "Database error" });
 
         connection.query("SELECT id, username, email FROM user WHERE id = ?", [result.insertId], (err, user) => {
-            if (err) return res.json({ success: false });
+            if (err) return res.json({ success: false, message: "User retrieval error" });
             res.json({ success: true, user: user[0] });
         });
     });

@@ -106,6 +106,27 @@
                 .then(res => res.json())
                 .then(() => location.reload());
         }
+
+        document.getElementById("searchInput").addEventListener("input", function () {
+            let query = this.value.trim();
+            fetch(`/search?q=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    let tableBody = document.getElementById("userTable");
+                    tableBody.innerHTML = "";
+                    data.forEach(user => {
+                        tableBody.innerHTML += `
+                            <tr id="row-${user.id}">
+                                <td>${user.id}</td>
+                                <td>${user.username}</td>
+                                <td>${user.email}</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.id}')">Delete</button>
+                                </td>
+                            </tr>`;
+                    });
+                });
+        });
     </script>
 
 </body>
