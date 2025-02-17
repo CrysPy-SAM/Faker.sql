@@ -71,63 +71,8 @@
         </div>
     </div>
 
-    <script>
-        document.getElementById("addUserForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            let username = document.getElementById("username").value.trim();
-            let email = document.getElementById("email").value.trim();
-            let password = document.getElementById("password").value.trim();
-
-            if (!username || !email || !password) {
-                Swal.fire("Error", "All fields are required!", "error");
-                return;
-            }
-
-            fetch("/add-user", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, email, password })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire("Success", "User added successfully!", "success").then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire("Error", "Failed to add user.", "error");
-                }
-            });
-        });
-
-        function deleteUser(userId) {
-            fetch(`/delete-user/${userId}`, { method: "POST" })
-                .then(res => res.json())
-                .then(() => location.reload());
-        }
-
-        document.getElementById("searchInput").addEventListener("input", function () {
-            let query = this.value.trim();
-            fetch(`/search?q=${query}`)
-                .then(res => res.json())
-                .then(data => {
-                    let tableBody = document.getElementById("userTable");
-                    tableBody.innerHTML = "";
-                    data.forEach(user => {
-                        tableBody.innerHTML += `
-                            <tr id="row-${user.id}">
-                                <td>${user.id}</td>
-                                <td>${user.username}</td>
-                                <td>${user.email}</td>
-                                <td>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.id}')">Delete</button>
-                                </td>
-                            </tr>`;
-                    });
-                });
-        });
-    </script>
+    <script src="/index.js"></script>
+    <script src="/server.js"></script>
 
 </body>
 </html>
